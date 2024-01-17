@@ -26,7 +26,7 @@ app.post('/register', async (req, res) => {
     Cpassword = req.body.Cpassword;
     if (username && password && Cpassword) {
         if (password == Cpassword) {
-            findUser = await User.findOne({ username : username });
+            findUser = await User.findOne({ username: username });
             if (findUser) {
                 return res.send("چنین نام کاربری وجود دارد")
             }
@@ -51,7 +51,27 @@ app.post('/register', async (req, res) => {
     }
 })
 
-app.post("/login" , )
+app.post("/login", async (req, res) => {
+    username = req.body.username;
+    password = req.body.password;
+    console.log(username, password)
+    find = await User.findOne({ username: username });
+    if (find) {
+        const comp_pass = bcrypt.compareSync(password, find.password);
+        if (!comp_pass) {
+            return res.send("password");
+        }
+        else {
+            const token = jwt.sign({ username: find.username }, 'amirreza', {
+                algorithm: "HS256",
+            });
+            res.status(200).send(token);
+        }
+    }
+    else {
+        return res.send("notFound")
+    }
+})
 
 app.listen(port, () => {
     console.log("listening on port", port);

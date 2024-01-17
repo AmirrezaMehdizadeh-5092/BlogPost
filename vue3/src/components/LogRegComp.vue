@@ -95,6 +95,22 @@
       </v-snackbar>
     </div>
     <div class="text-center ma-2">
+      <v-snackbar v-model="snackbar3">
+        {{ text }}
+        <template v-slot:actions>
+          <v-btn
+            color="pink"
+            variant="text"
+            @click="
+              Login_finish()
+            "
+          >
+            بستن
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
+    <div class="text-center ma-2">
       <v-snackbar v-model="snackbar2">
         {{ text }}
         <template v-slot:actions>
@@ -120,6 +136,8 @@ import { ref } from "vue";
 import HeaderComp from "./HeaderComp.vue";
 import { useStore } from "../plugins/pinia";
 import axios from "axios";
+import router from "../plugins/router";
+import cookie from "js-cookie";
 
 export default {
   name: "LogRegComp",
@@ -135,6 +153,7 @@ export default {
     const text = ref("");
     const snackbar = ref(false);
     const snackbar2 = ref(false);
+    const snackbar3 = ref(false);
     const R_username = ref("");
     const R_password = ref("");
     const R_Cpasword = ref("");
@@ -182,11 +201,17 @@ export default {
         };
         axios.post(store.api + "/login", obj).then((response) => {
           if (response.status == 200) {
-            snackbar2.value = true;
-            text.value = response.data;
-          } else if (response.data == "existing") {
+            snackbar3.value = true;
+            text.value = "ورود انجام شد";
+            cookie.set("token" , response.data);
+          } 
+          if (response.data == "notFound") {
             snackbar.value = true;
-            return (text.value = response.data);
+            text.value = "کاربر مورد نظر پیدا نشد";
+          }
+          if (response.data == "password") {
+            snackbar.value = true;
+            text.value = "پسورد شما اشتباه است";
           }
         });
       } else {
@@ -195,8 +220,14 @@ export default {
       }
     };
 
+    const Login_finish = ()=>{
+      snackbar3.value = false;
+      router.push("/")
+    }
+
     return {
       snackbar2,
+      snackbar3,
       formLogin,
       formRegister,
       Register,
@@ -208,6 +239,7 @@ export default {
       L_username,
       L_password,
       Login,
+      Login_finish
     };
   },
 };
