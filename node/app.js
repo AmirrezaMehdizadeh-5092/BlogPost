@@ -18,10 +18,11 @@ app.use(cors());
 app.use(express.json())
 app.use(bodyparser.urlencoded([extended = true]));
 
-app.post("/token", (req, res) => {
+app.post("/token", async(req, res) => {
     token = req.body.token;
     let decoded = jwt.verify(token, secret);
-    res.send(decoded.username);
+    articles = await Article.find({ user_id : decoded.username});
+    res.send(articles);
 })
 
 app.post('/register', async (req, res) => {

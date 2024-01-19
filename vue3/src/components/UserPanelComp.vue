@@ -58,7 +58,7 @@
       </div>
     </nav>
     <div v-if="add_article" class="add_article">
-      <div class="add_article_form w-50 mx-auto mt-10">
+      <div class="add_article_form mx-auto mt-10">
         <div class="mb-3">
           <label for="exampleFormControlInput1" class="mb-2">موضوع</label>
           <input
@@ -98,21 +98,23 @@
       </div>
     </div>
     <div v-if="show_edit" class="show_edit">
-      <div class="add_article_form w-50 mx-auto mt-10">
+      <div class="add_article_form mx-auto mt-10">
         <div class="list-group">
           <div
-            class="list-group-item list-group-item-action flex-column align-items-start mb-3 active"
+            v-for="article in articles"
+            class="list-group-item list-group-item-action flex-column align-items-start mb-4 active"
           >
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="fs-4 mb-4 mt-2">List group item heading</h5>
-              <small>3 days ago</small>
+            <div
+              class="d-flex w-100 justify-content-between align-items-center flex-row flex-wrap"
+            >
+              <h5 class="fs-4 ">{{ article.subject }}</h5>
+              <small>{{ article.joinDate.substring(0,16).replace("T", ' ') }}</small>
             </div>
-            <p class="fs-6 mb-2">
-              Donec id elit non mi porta gravida at eget metus. Maecenas sed
-              diam eget risus varius blandit.
+            <p class="fs-6 mb-2 mt-3">
+              {{ article.description }}
             </p>
             <div class="w-100 my-4">
-              <button class="btn btn-warning">حذف</button>
+              <button @click="Del_article(i)" class="btn btn-warning">حذف</button>
               <button class="btn btn-light mx-2">ویرایش</button>
             </div>
           </div>
@@ -156,6 +158,7 @@ export default {
   },
   setup() {
     const store = useStore();
+    const articles = ref("");
     const snackbar = ref(false);
     const snackbar2 = ref(false);
     const msg = ref("");
@@ -194,18 +197,24 @@ export default {
       window.location.reload();
     };
 
+    const Del_article = (index) => {
+      console.log(index);
+    }
+
     onMounted(() => {
       let token = cookie.get("token");
       if (!token) {
         router.push("/login");
       } else {
         axios.post(store.api + "/token", { token }).then((response) => {
-          user.value = response.data;
+          user.value = response.data[0].user_id;
+          articles.value = response.data;
         });
       }
     });
 
     return {
+      articles,
       snackbar,
       snackbar2,
       msg,
@@ -217,7 +226,24 @@ export default {
       text,
       Confirm_article,
       finish_add,
+      Del_article
     };
   },
 };
 </script>
+
+<style>
+.add_article_form {
+  width: 50%;
+}
+@media (min-width: 320px) and (max-width: 480px) {
+  .add_article_form {
+    width: 75%;
+  }
+}
+@media (min-width: 481px) and (max-width: 991px) {
+  .add_article_form {
+    width: 60%;
+  }
+}
+</style>
