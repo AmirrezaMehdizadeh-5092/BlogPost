@@ -54,7 +54,7 @@
             </li>
           </ul>
         </div>
-        <span style="cursor: pointer" class="text-primary ml-4">خروج</span>
+        <span @click="Logout()" style="cursor: pointer" class="text-primary ml-4">خروج</span>
       </div>
     </nav>
     <div v-if="add_article" class="add_article">
@@ -105,7 +105,7 @@
             class="list-group-item list-group-item-action flex-column align-items-start mb-4 active"
           >
             <div
-              class="d-flex w-100 justify-content-between align-items-center flex-row flex-wrap"
+              class=" d-flex w-100 justify-content-between align-items-center flex-row flex-wrap"
             >
               <h5 class="fs-4">{{ article.subject }}</h5>
               <small>{{
@@ -119,7 +119,9 @@
               <button @click="Del_article(article)" class="btn btn-warning">
                 حذف
               </button>
-              <button class="btn btn-light mx-2">ویرایش</button>
+              <button @click="show(article)" class="btn btn-light mx-2">
+                ویرایش
+              </button>
             </div>
           </div>
         </div>
@@ -145,6 +147,26 @@
         </template>
       </v-snackbar>
     </div>
+    <v-row justify="center">
+      <v-dialog v-model="explain" width="800">
+        <v-card>
+          <v-card-title class="mt-2">
+            <span class="text-h5">{{ show_obj.subject }}</span>
+          </v-card-title>
+          <v-card-text> {{ show_obj.text }}; </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green-darken-1"
+              variant="text"
+              @click="explain = false"
+            >
+              بستن
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </div>
 </template>
 
@@ -172,6 +194,8 @@ export default {
     const subject = ref("");
     const description = ref("");
     const text = ref("");
+    const explain = ref(false);
+    const show_obj = ref("");
 
     const Confirm_article = () => {
       if (subject.value && description.value && text.value) {
@@ -209,17 +233,34 @@ export default {
       });
     };
 
+    const show = (index) => {
+      explain.value = true;
+      show_obj.value = index;
+    };
+
+    const Logout = ()=>{
+      cookie.set("token" , '');
+      window.location.reload();
+    }
+
     onMounted(() => {
       let token = cookie.get("token");
-      if (!token) {
+      if (!token) 
+      {
         router.push("/login");
-      } else {
+      } 
+      else 
+      {
         axios.post(store.api + "/token", { token }).then((response) => {
           user.value = response.data;
           var userid = response.data;
           axios.post(store.api + "/articles", { userid }).then((response) => {
             articles.value = response.data;
           });
+        }).catch((error) => {
+          
+            window.location.href = "/login";
+          
         });
       }
     });
@@ -238,6 +279,10 @@ export default {
       Confirm_article,
       finish_add,
       Del_article,
+      explain,
+      show_obj,
+      show,
+      Logout,
     };
   },
 };
