@@ -1,6 +1,6 @@
 <template>
   <div id="header">
-    <nav class="navbar navbar-expand-lg py-3 bg-primary-subtle">
+    <nav class="navbar navbar-expand-lg py-4 bg-primary-subtle">
       <div class="container-fluid">
         <button
           class="navbar-toggler"
@@ -25,7 +25,7 @@
                 <router-link class="nav-link active" aria-current="page" to="/about">درباره ما</router-link>
             </li>
             <li class="nav-item px-3">
-                <router-link class="nav-link active" aria-current="page" to="/login">ورود / ثبت نام</router-link>
+                <router-link class="nav-link active" aria-current="page" to="/user">ورود به پنل</router-link>
             </li>
           </ul>
           <form class="d-flex" role="search">

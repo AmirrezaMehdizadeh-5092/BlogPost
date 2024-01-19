@@ -222,7 +222,7 @@ export default {
 
     const Login_finish = ()=>{
       snackbar3.value = false;
-      router.push("/")
+      router.push("/user")
     }
 
     return {

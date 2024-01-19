@@ -7,17 +7,21 @@ const bcrypt = require('bcryptjs');
 
 const app = express();
 const port = 5092;
+const secret = "amir"
 
 mongoose.connect('mongodb://127.0.0.1:27017/Blog').then(() => console.log('Database connected ...'));
 
 const User = require("./model/user");
+const Article = require("./model/article");
 
 app.use(cors());
 app.use(express.json())
 app.use(bodyparser.urlencoded([extended = true]));
 
-app.get('/', (req, res) => {
-    res.send("sd")
+app.post("/token", (req, res) => {
+    token = req.body.token;
+    let decoded = jwt.verify(token, secret);
+    res.send(decoded.username);
 })
 
 app.post('/register', async (req, res) => {
@@ -62,7 +66,7 @@ app.post("/login", async (req, res) => {
             return res.send("password");
         }
         else {
-            const token = jwt.sign({ username: find.username }, 'amirreza', {
+            const token = jwt.sign({ username: find.username }, secret, {
                 algorithm: "HS256",
             });
             res.status(200).send(token);
@@ -71,6 +75,26 @@ app.post("/login", async (req, res) => {
     else {
         return res.send("notFound")
     }
+})
+
+app.post('/add_article', async (req, res) => {
+    rand = Math.floor(Math.random() * 101) + 100;
+    user_id = req.body.user_id;
+    art_id = user_id + rand;
+    subject = req.body.subject;
+    description = req.body.description;
+    text = req.body.text;
+
+    let NewArticle = new Article({
+        art_id,
+        user_id,
+        subject,
+        description,
+        text
+    })
+    NewArticle.save().then(() => {
+        res.send("success")
+    })
 })
 
 app.listen(port, () => {
