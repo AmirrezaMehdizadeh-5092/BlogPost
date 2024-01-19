@@ -107,14 +107,18 @@
             <div
               class="d-flex w-100 justify-content-between align-items-center flex-row flex-wrap"
             >
-              <h5 class="fs-4 ">{{ article.subject }}</h5>
-              <small>{{ article.joinDate.substring(0,16).replace("T", ' ') }}</small>
+              <h5 class="fs-4">{{ article.subject }}</h5>
+              <small>{{
+                article.joinDate.substring(0, 16).replace("T", " ")
+              }}</small>
             </div>
             <p class="fs-6 mb-2 mt-3">
               {{ article.description }}
             </p>
             <div class="w-100 my-4">
-              <button @click="Del_article(i)" class="btn btn-warning">حذف</button>
+              <button @click="Del_article(article)" class="btn btn-warning">
+                حذف
+              </button>
               <button class="btn btn-light mx-2">ویرایش</button>
             </div>
           </div>
@@ -198,8 +202,12 @@ export default {
     };
 
     const Del_article = (index) => {
-      console.log(index);
-    }
+      let art_id = index.art_id;
+      axios.post(store.api + "/del_article", { art_id }).then((response) => {
+        snackbar2.value = true;
+        msg.value = response.data;
+      });
+    };
 
     onMounted(() => {
       let token = cookie.get("token");
@@ -207,8 +215,11 @@ export default {
         router.push("/login");
       } else {
         axios.post(store.api + "/token", { token }).then((response) => {
-          user.value = response.data[0].user_id;
-          articles.value = response.data;
+          user.value = response.data;
+          var userid = response.data;
+          axios.post(store.api + "/articles", { userid }).then((response) => {
+            articles.value = response.data;
+          });
         });
       }
     });
@@ -226,7 +237,7 @@ export default {
       text,
       Confirm_article,
       finish_add,
-      Del_article
+      Del_article,
     };
   },
 };

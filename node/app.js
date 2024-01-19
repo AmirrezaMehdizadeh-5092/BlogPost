@@ -18,11 +18,10 @@ app.use(cors());
 app.use(express.json())
 app.use(bodyparser.urlencoded([extended = true]));
 
-app.post("/token", async(req, res) => {
+app.post("/token", async (req, res) => {
     token = req.body.token;
     let decoded = jwt.verify(token, secret);
-    articles = await Article.find({ user_id : decoded.username});
-    res.send(articles);
+    res.send(decoded.username);
 })
 
 app.post('/register', async (req, res) => {
@@ -96,6 +95,18 @@ app.post('/add_article', async (req, res) => {
     NewArticle.save().then(() => {
         res.send("success")
     })
+})
+
+app.post('/articles', async (req, res) => {
+    userid = req.body.userid;
+    articles = await Article.find({ user_id: userid });
+    res.send(articles)
+})
+
+app.post("/del_article", async (req, res) => {
+    art_id = req.body.art_id;
+    await Article.deleteOne({ art_id });
+    res.send('مقاله با موفقیت حذف شد');
 })
 
 app.listen(port, () => {
