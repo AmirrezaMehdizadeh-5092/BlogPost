@@ -14,27 +14,37 @@
 
 ## Ui framework
 
+```bash
 vuetify
 
 bootstrap5
+```
 
 ## Library
 
+```bash
 axios
 
 vue-router
+```
 
 ## Database
 
+```bash
 mongodb
+```
 
 ## State Managment
 
+```bash
 pinia
+```
 
 ## Authentication
 
+```bash
 jwt
+```
 
 ## Setup
 
