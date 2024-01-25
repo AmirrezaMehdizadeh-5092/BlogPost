@@ -120,6 +120,9 @@
                 حذف
               </button>
               <button @click="show(article)" class="btn btn-light mx-2">
+                مشاهده
+              </button>
+              <button @click="Edit(article)" class="btn btn-light ">
                 ویرایش
               </button>
             </div>
@@ -148,12 +151,60 @@
       </v-snackbar>
     </div>
     <v-row justify="center">
+      <v-dialog v-model="edit" width="800">
+        <v-card>
+          <v-card-title class="mt-2">
+            <span class="text-h5">{{ show_obj.subject }}</span>
+          </v-card-title>
+          <v-card-text>
+            <div class="mb-3">
+              <label for="exampleFormControlInput1" class="mb-2">توضیحات</label>
+              <input
+                type="text"
+                class="form-control"
+                id="exampleFormControlInput1"
+                v-model="edit_description"
+              />
+            </div>
+            <div class="mb-3">
+              <label for="exampleFormControlTextarea1" class="form-label mb-2"
+                >متن</label
+              >
+              <textarea
+                class="form-control"
+                id="exampleFormControlTextarea1"
+                rows="5"
+                v-model="edit_text"
+              ></textarea>
+            </div>
+            <button
+            @click="edit_article(show_obj)"
+            type="button"
+            class="w-25 mt-3 btn btn-primary"
+          >
+            ثبت
+          </button>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green-darken-1"
+              variant="text"
+              @click="edit = false"
+            >
+              بستن
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
+    <v-row justify="center">
       <v-dialog v-model="explain" width="800">
         <v-card>
           <v-card-title class="mt-2">
             <span class="text-h5">{{ show_obj.subject }}</span>
           </v-card-title>
-          <v-card-text> {{ show_obj.text }}; </v-card-text>
+          <v-card-text> {{ show_obj.text }} </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
@@ -196,6 +247,9 @@ export default {
     const text = ref("");
     const explain = ref(false);
     const show_obj = ref("");
+    const edit = ref(false);
+    const edit_description = ref("");
+    const edit_text = ref("");
 
     const Confirm_article = () => {
       if (subject.value && description.value && text.value) {
@@ -237,6 +291,38 @@ export default {
       explain.value = true;
       show_obj.value = index;
     };
+
+    const Edit = (index) => {
+      edit.value = true;
+      show_obj.value = index;
+    }
+
+    const edit_article = (index) => {
+      if (edit_description.value && edit_text.value)
+      {
+        let obj = {
+          art_id : index.art_id,
+          new_description : edit_description.value,
+          new_text : edit_text.value
+        }
+        axios.post(store.api + '/edit_article', obj).then((response)=>{
+          if (response.data == "success")
+          {
+            alert("ویرایش مقاله با موفقیت انجام شد");
+            window.location.reload()
+          }
+          else 
+          {
+            alert("خطایی رخ داد. لطفا دوباره امتحان کنید");
+            window.location.reload()
+          }
+        })
+      }
+      else 
+      {
+        alert("لطفا برای ویرایش اطلاعات را وارد کنید")
+      }
+    }
 
     const Logout = ()=>{
       cookie.set("token" , '');
@@ -282,7 +368,12 @@ export default {
       explain,
       show_obj,
       show,
+      edit,
       Logout,
+      Edit,
+      edit_description,
+      edit_text,
+      edit_article
     };
   },
 };

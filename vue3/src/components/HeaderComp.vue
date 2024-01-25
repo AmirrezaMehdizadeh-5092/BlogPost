@@ -22,9 +22,6 @@
               <router-link class="nav-link active" aria-current="page" to="/">خانه</router-link>
             </li>
             <li class="nav-item px-3">
-                <router-link class="nav-link active" aria-current="page" to="/about">درباره ما</router-link>
-            </li>
-            <li class="nav-item px-3">
                 <router-link class="nav-link active" aria-current="page" to="/user">ورود به پنل</router-link>
             </li>
           </ul>

@@ -109,6 +109,20 @@ app.post("/del_article", async (req, res) => {
     res.send('مقاله با موفقیت حذف شد');
 })
 
+app.post("/edit_article", async (req, res) => {
+    art_id = req.body.art_id;
+    new_description = req.body.new_description;
+    new_text = req.body.new_text;
+    await Article.updateMany({ art_id: art_id },
+        {
+            $set: {
+                description: new_description,
+                text: new_text
+            }
+        })
+    res.send("success");
+});
+
 app.listen(port, () => {
     console.log("listening on port", port);
 })
