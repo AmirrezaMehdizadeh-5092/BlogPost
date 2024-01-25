@@ -68,7 +68,9 @@
                 {{ article.description }}
               </p>
               <div class="w-100 my-4">
-                <button @click="show(article)" class="btn btn-light">مشاهده</button>
+                <button @click="show(article)" class="btn btn-light">
+                  مشاهده
+                </button>
               </div>
               <div class="w-100 my-4">
                 <span class="fs-6" style="color: yellow"
@@ -79,7 +81,7 @@
           </div>
         </div>
       </div>
-      <hr>
+      <hr />
     </div>
   </div>
 </template>
@@ -96,21 +98,19 @@ export default {
     const search_val = ref("");
     const negetiveSearch = ref(false);
     const search_res = ref(false);
-    const articles = ref('')
+    const articles = ref("");
 
     const search = () => {
       let obj = {
         search_val: search_val.value,
       };
       axios.post(store.api + "/search", obj).then((response) => {
-        search_res.value = true
+        search_res.value = true;
         console.log(response.data);
         if (response.data.length == 0) {
           negetiveSearch.value = true;
-        }
-        else 
-        {
-          articles.value = response.data
+        } else {
+          articles.value = response.data;
           negetiveSearch.value = false;
         }
       });
@@ -121,7 +121,7 @@ export default {
       search,
       negetiveSearch,
       search_res,
-      articles
+      articles,
     };
   },
 };

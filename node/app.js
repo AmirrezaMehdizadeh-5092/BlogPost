@@ -132,6 +132,31 @@ app.post("/edit_article", async (req, res) => {
     res.send("success");
 });
 
+app.post("/admin_login", async (req, res) => {
+    username = req.body.username;
+    password = req.body.password;
+    console.log(username, password)
+    find = await User.findOne({ username: username });
+    if (find) {
+        if (password != find.password) {
+            return res.send("password");
+        }
+        else {
+            const token = jwt.sign({ username: find.username }, secret, {
+                algorithm: "HS256",
+            });
+            let obj = {
+                token, 
+                check : "ok"
+            }
+            res.status(200).send(obj);
+        }
+    }
+    else {
+        return res.send("notFound")
+    }
+
+})
 app.post("/search", async (req, res) => {
     search_val = req.body.search_val
     search_result = await Article.find({
