@@ -64,6 +64,40 @@
         >
       </div>
     </nav>
+    <div v-if="show_user" class="show_edit">
+      <div class="add_article_form mx-auto mt-10">
+        <div class="list-group">
+          <div
+            v-for="user in useres"
+            class="list-group-item list-group-item-action flex-column align-items-start mb-4 active"
+          >
+            <div
+              class="d-flex w-100 justify-content-between align-items-center flex-row flex-wrap"
+            >
+              <h5 class="fs-4">{{ user.username }}</h5>
+              <small>{{
+                user.joinDate.substring(0, 16).replace("T", " ")
+              }}</small>
+            </div>
+            <div class="w-100 my-4">
+              <button @click="Del_user(user)" class="btn btn-warning">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center ma-2">
+        <v-snackbar v-model="snackbar2">
+          {{ msg }}
+          <template v-slot:actions>
+            <v-btn color="pink" variant="text" @click="finish_del()">
+              بستن
+            </v-btn>
+          </template>
+        </v-snackbar>
+      </div>
   </div>
 </template>
 
@@ -71,10 +105,34 @@
 import { ref, onMounted } from "vue";
 import cookie from "js-cookie";
 import router from "../plugins/router";
+import { useStore } from "../plugins/pinia";
+import axios from "axios";
 
 export default {
   name: "AdminPanel",
+  created() {
+    document.title = "پنل ادمین";
+  },
   setup() {
+    const store = useStore();
+    const show_user = ref(true);
+    const useres = ref("");
+    const snackbar2 = ref(false);
+    const msg = ref("");
+
+    const Del_user = (index) => {
+      let username = index.username;
+      axios.post(store.api + "/del_user", { username }).then((response) => {
+        snackbar2.value = true;
+        msg.value = response.data;
+      });
+    };
+
+    const finish_del = () => {
+      snackbar2.value = false;
+      window.location.reload();
+    };
+
     const Logout = () => {
       cookie.set("admin", "");
       window.location.reload();
@@ -85,11 +143,20 @@ export default {
       if (!token) {
         router.push("/adminlogin");
       }
+      axios.get(store.api + "/get_user").then((response) => {
+        useres.value = response.data;
+      });
     });
 
-    return{
-        Logout
-    }
+    return {
+      Logout,
+      Del_user,
+      show_user,
+      useres,
+      snackbar2,
+      msg,
+      finish_del
+    };
   },
 };
 </script>

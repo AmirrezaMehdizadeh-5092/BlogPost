@@ -27,6 +27,11 @@ app.get("/get_article", async (req, res) => {
     res.send(articles)
 })
 
+app.get("/get_user" , async (req, res) => {
+    useres = await User.find({role : "user"});
+    res.send(useres);
+})
+
 app.post("/token", async (req, res) => {
     token = req.body.token;
     let decoded = jwt.verify(token, secret);
@@ -157,6 +162,7 @@ app.post("/admin_login", async (req, res) => {
     }
 
 })
+
 app.post("/search", async (req, res) => {
     search_val = req.body.search_val
     search_result = await Article.find({
@@ -173,6 +179,12 @@ app.post("/search", async (req, res) => {
     else if (search_result == []) {
         res.send("نتیجه ای یافت نشد")
     }
+})
+
+app.post("/del_user" , async (req, res) => {
+    username = req.body.username;
+    await User.deleteOne({ username });
+    res.send('کاربر با موفقیت حذف شد');
 })
 
 app.listen(port, () => {
