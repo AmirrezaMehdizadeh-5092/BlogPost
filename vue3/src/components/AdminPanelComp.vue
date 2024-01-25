@@ -18,7 +18,13 @@
             class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll"
             style="--bs-scroll-height: 100px"
           >
-            <li class="nav-item px-3">
+            <li
+              @click="
+                show_article = false;
+                show_user = !show_user;
+              "
+              class="nav-item px-3"
+            >
               <span
                 style="cursor: pointer"
                 class="nav-link active"
@@ -28,8 +34,8 @@
             </li>
             <li
               @click="
-                add_article = false;
-                show_edit = !show_edit;
+                show_user = false;
+                show_article = !show_article;
               "
               class="nav-item px-3"
             >
@@ -88,16 +94,66 @@
         </div>
       </div>
     </div>
-    <div class="text-center ma-2">
-        <v-snackbar v-model="snackbar2">
-          {{ msg }}
-          <template v-slot:actions>
-            <v-btn color="pink" variant="text" @click="finish_del()">
-              بستن
-            </v-btn>
-          </template>
-        </v-snackbar>
+    <div v-if="show_article" class="show_edit">
+      <div class="add_article_form mx-auto mt-10">
+        <div class="list-group">
+          <div
+            v-for="article in articles"
+            class="list-group-item list-group-item-action flex-column align-items-start mb-4 active"
+          >
+            <div
+              class="d-flex w-100 justify-content-between align-items-center flex-row flex-wrap"
+            >
+              <h5 class="fs-4">{{ article.subject }}</h5>
+              <small>{{
+                article.joinDate.substring(0, 16).replace("T", " ")
+              }}</small>
+            </div>
+            <p class="fs-6 mb-2 mt-2">
+              {{ article.description }}
+            </p>
+            <div class="w-100 my-4">
+              <button @click="Del_article(article)" class="btn btn-warning">
+                حذف
+              </button>
+              <button @click="show(article)" class="btn btn-light mx-2">
+                مشاهده
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+    <div class="text-center ma-2">
+      <v-snackbar v-model="snackbar2">
+        {{ msg }}
+        <template v-slot:actions>
+          <v-btn color="pink" variant="text" @click="finish_del()">
+            بستن
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
+    <v-row justify="center">
+        <v-dialog v-model="explain" width="800">
+          <v-card>
+            <v-card-title class="mt-2">
+              <span class="text-h5">{{ show_obj.subject }}</span>
+            </v-card-title>
+            <v-card-text> {{ show_obj.text }} </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="green-darken-1"
+                variant="text"
+                @click="explain = false"
+              >
+                بستن
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-row>
   </div>
 </template>
 
@@ -116,9 +172,26 @@ export default {
   setup() {
     const store = useStore();
     const show_user = ref(true);
+    const show_article = ref(false);
     const useres = ref("");
     const snackbar2 = ref(false);
     const msg = ref("");
+    const articles = ref("");
+    const explain = ref(false);
+    const show_obj = ref('');
+
+    const show = (index) => {
+      explain.value = true;
+      show_obj.value = index;
+    };
+
+    const Del_article = (index) => {
+      let art_id = index.art_id;
+      axios.post(store.api + "/del_article", { art_id }).then((response) => {
+        snackbar2.value = true;
+        msg.value = response.data;
+      });
+    };
 
     const Del_user = (index) => {
       let username = index.username;
@@ -146,6 +219,9 @@ export default {
       axios.get(store.api + "/get_user").then((response) => {
         useres.value = response.data;
       });
+      axios.get(store.api + "/get_article").then((response) => {
+        articles.value = response.data;
+      });
     });
 
     return {
@@ -155,7 +231,13 @@ export default {
       useres,
       snackbar2,
       msg,
-      finish_del
+      finish_del,
+      show_article,
+      articles,
+      Del_article,
+      show,
+      explain,
+      show_obj
     };
   },
 };
