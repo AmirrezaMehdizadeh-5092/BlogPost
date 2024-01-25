@@ -132,6 +132,24 @@ app.post("/edit_article", async (req, res) => {
     res.send("success");
 });
 
+app.post("/search", async (req, res) => {
+    search_val = req.body.search_val
+    search_result = await Article.find({
+        $or: [
+            { subject: { $in: search_val } },
+            { user_id: { $in: search_val } },
+            { text: { $in: search_val } },
+            { description: { $in: search_val } }
+        ]
+    });
+    if (search_result) {
+        res.send(search_result)
+    }
+    else if (search_result == []) {
+        res.send("نتیجه ای یافت نشد")
+    }
+})
+
 app.listen(port, () => {
     console.log("listening on port", port);
 })
