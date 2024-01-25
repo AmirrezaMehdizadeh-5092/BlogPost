@@ -21,6 +21,7 @@
             <li
               @click="
                 show_article = false;
+                add_article = false;
                 show_user = !show_user;
               "
               class="nav-item px-3"
@@ -35,6 +36,7 @@
             <li
               @click="
                 show_user = false;
+                add_article = false;
                 show_article = !show_article;
               "
               class="nav-item px-3"
@@ -49,7 +51,8 @@
             <li
               class="nav-item px-3"
               @click="
-                show_edit = false;
+                show_user = false;
+                show_article = false;
                 add_article = !add_article;
               "
             >
@@ -124,6 +127,46 @@
         </div>
       </div>
     </div>
+    <div v-if="add_article" class="add_article">
+      <div class="add_article_form mx-auto mt-10">
+        <div class="mb-3">
+          <label for="exampleFormControlInput1" class="mb-2">موضوع</label>
+          <input
+            type="text"
+            class="form-control"
+            id="exampleFormControlInput1"
+            v-model="subject"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="exampleFormControlInput1" class="mb-2">توضیحات</label>
+          <input
+            type="text"
+            class="form-control"
+            id="exampleFormControlInput1"
+            v-model="description"
+          />
+        </div>
+        <div class="mb-3">
+          <label for="exampleFormControlTextarea1" class="form-label mb-2"
+            >متن</label
+          >
+          <textarea
+            class="form-control"
+            id="exampleFormControlTextarea1"
+            rows="5"
+            v-model="text"
+          ></textarea>
+        </div>
+        <button
+          @click="Confirm_article()"
+          type="button"
+          class="w-25 mt-3 btn btn-primary"
+        >
+          ثبت
+        </button>
+      </div>
+    </div>
     <div class="text-center ma-2">
       <v-snackbar v-model="snackbar2">
         {{ msg }}
@@ -134,26 +177,36 @@
         </template>
       </v-snackbar>
     </div>
+    <div class="text-center ma-2">
+      <v-snackbar v-model="snackbar">
+        {{ msg }}
+        <template v-slot:actions>
+          <v-btn color="pink" variant="text" @click="snackbar = false">
+            بستن
+          </v-btn>
+        </template>
+      </v-snackbar>
+    </div>
     <v-row justify="center">
-        <v-dialog v-model="explain" width="800">
-          <v-card>
-            <v-card-title class="mt-2">
-              <span class="text-h5">{{ show_obj.subject }}</span>
-            </v-card-title>
-            <v-card-text> {{ show_obj.text }} </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="green-darken-1"
-                variant="text"
-                @click="explain = false"
-              >
-                بستن
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-row>
+      <v-dialog v-model="explain" width="800">
+        <v-card>
+          <v-card-title class="mt-2">
+            <span class="text-h5">{{ show_obj.subject }}</span>
+          </v-card-title>
+          <v-card-text> {{ show_obj.text }} </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green-darken-1"
+              variant="text"
+              @click="explain = false"
+            >
+              بستن
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </div>
 </template>
 
@@ -178,7 +231,35 @@ export default {
     const msg = ref("");
     const articles = ref("");
     const explain = ref(false);
-    const show_obj = ref('');
+    const show_obj = ref("");
+    const add_article = ref(false);
+    const subject = ref("");
+    const description = ref("");
+    const text = ref("");
+    const snackbar = ref(false);
+
+    const Confirm_article = () => {
+      if (subject.value && description.value && text.value) {
+        let obj = {
+          user_id: "admin",
+          subject: subject.value,
+          description: description.value,
+          text: text.value,
+        };
+        axios.post(store.api + "/add_article", obj).then((response) => {
+          if (response.data == "success") {
+            snackbar2.value = true;
+            msg.value = "مقاله با موفقیت ثبت شد";
+          } else {
+            snackbar.value = true;
+            msg.value = "خظایی رخ داد";
+          }
+        });
+      } else {
+        snackbar.value = true;
+        msg.value = "تمام فیلدهارا پر کنید";
+      }
+    };
 
     const show = (index) => {
       explain.value = true;
@@ -229,6 +310,7 @@ export default {
       Del_user,
       show_user,
       useres,
+      snackbar,
       snackbar2,
       msg,
       finish_del,
@@ -237,7 +319,12 @@ export default {
       Del_article,
       show,
       explain,
-      show_obj
+      show_obj,
+      add_article,
+      subject,
+      description,
+      text,
+      Confirm_article,
     };
   },
 };
