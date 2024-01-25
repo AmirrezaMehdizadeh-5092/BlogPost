@@ -18,6 +18,15 @@ app.use(cors());
 app.use(express.json())
 app.use(bodyparser.urlencoded([extended = true]));
 
+app.get("/get_article", async (req, res) => {
+    articles = await Article.aggregate(
+        [
+            { $sort: { joinDate: 1 } }
+        ]
+    )
+    res.send(articles)
+})
+
 app.post("/token", async (req, res) => {
     token = req.body.token;
     let decoded = jwt.verify(token, secret);

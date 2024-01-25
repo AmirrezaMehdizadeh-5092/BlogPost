@@ -112,7 +112,7 @@
                 article.joinDate.substring(0, 16).replace("T", " ")
               }}</small>
             </div>
-            <p class="fs-6 mb-2 mt-3">
+            <p class="fs-6 mb-2 mt-2">
               {{ article.description }}
             </p>
             <div class="w-100 my-4">
