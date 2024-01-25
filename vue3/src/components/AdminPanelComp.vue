@@ -22,6 +22,7 @@
               @click="
                 show_article = false;
                 add_article = false;
+                add_user = false;
                 show_user = !show_user;
               "
               class="nav-item px-3"
@@ -35,8 +36,25 @@
             </li>
             <li
               @click="
+                show_article = false;
+                add_article = false;
+                show_user = false;
+                add_user = !add_user;
+              "
+              class="nav-item px-3"
+            >
+              <span
+                style="cursor: pointer"
+                class="nav-link active"
+                aria-current="page"
+                >افزودن کاربر</span
+              >
+            </li>
+            <li
+              @click="
                 show_user = false;
                 add_article = false;
+                add_user = false;
                 show_article = !show_article;
               "
               class="nav-item px-3"
@@ -53,6 +71,7 @@
               @click="
                 show_user = false;
                 show_article = false;
+                add_user = false;
                 add_article = !add_article;
               "
             >
@@ -73,7 +92,7 @@
         >
       </div>
     </nav>
-    <div v-if="show_user" class="show_edit">
+    <div v-if="show_user" class="show_user">
       <div class="add_article_form mx-auto mt-10">
         <div class="list-group">
           <div
@@ -97,7 +116,7 @@
         </div>
       </div>
     </div>
-    <div v-if="show_article" class="show_edit">
+    <div v-if="show_article" class="show_article">
       <div class="add_article_form mx-auto mt-10">
         <div class="list-group">
           <div
@@ -167,6 +186,43 @@
         </button>
       </div>
     </div>
+    <div v-if="add_user" class="add_user">
+      <div class="formLogin">
+        <div class="w-100 mb-3">
+          <label for="formGroupExampleInput" class="mb-2">نام کاربری</label>
+          <input
+            v-model="username"
+            type="text"
+            class="form-control"
+            id="formGroupExampleInput"
+          />
+        </div>
+        <div class="w-100 mb-5">
+          <label for="formGroupExampleInput" class="mb-2">پسورد</label>
+          <input
+            type="password"
+            class="form-control"
+            id="formGroupExampleInput"
+            v-model="password"
+          />
+        </div>
+        <select
+          v-model="select"
+          class="mb-5 p-2"
+          name=""
+          id=""
+          style="width: 100%; border: 1px solid black"
+        >
+          <option v-bind:value="{ id: 'user' }" value="user">کاربر</option>
+          <option v-bind:value="{ id: 'admin' }" value="admin">ادمین</option>
+        </select>
+        <div class="w-100 mb-5">
+          <button @click="User()" type="button" class="w-100 btn btn-primary">
+            ورود
+          </button>
+        </div>
+      </div>
+    </div>
     <div class="text-center ma-2">
       <v-snackbar v-model="snackbar2">
         {{ msg }}
@@ -226,6 +282,7 @@ export default {
     const store = useStore();
     const show_user = ref(true);
     const show_article = ref(false);
+    const add_user = ref(false);
     const useres = ref("");
     const snackbar2 = ref(false);
     const msg = ref("");
@@ -237,6 +294,36 @@ export default {
     const description = ref("");
     const text = ref("");
     const snackbar = ref(false);
+    const username = ref("");
+    const password = ref("");
+    const select = ref({ id: "user" });
+
+    const User = () => {
+      if (username.value && password.value) {
+        if (password.value.length >= 4) {
+          let obj = {
+            username: username.value,
+            password: password.value,
+            role: select.value.id,
+          };
+          axios.post(store.api + "/add_user", obj).then((response) => {
+            if (response.status == 200) {
+              snackbar2.value = true;
+              msg.value = response.data;
+            } else if (response.data == "existing") {
+              snackbar.value = true;
+              return (msg.value = response.data);
+            }
+          });
+        } else {
+          snackbar.value = true;
+          msg.value = "طول پسورد باید بیشتر از 4 کاراکتر باشد";
+        }
+      } else {
+        snackbar.value = true;
+        msg.value = "لطفا تمام قیلدها را پر کنید";
+      }
+    };
 
     const Confirm_article = () => {
       if (subject.value && description.value && text.value) {
@@ -325,7 +412,31 @@ export default {
       description,
       text,
       Confirm_article,
+      add_user,
+      username,
+      password,
+      select,
+      User,
     };
   },
 };
 </script>
+<style>
+.formLogin,
+formRegister {
+  width: 25%;
+  margin: 50px auto;
+}
+@media (min-width: 320px) and (max-width: 480px) {
+  .formLogin,
+  formRegister {
+    width: 75%;
+  }
+}
+@media (min-width: 481px) and (max-width: 991px) {
+  .formLogin,
+  formRegister {
+    width: 50%;
+  }
+}
+</style>

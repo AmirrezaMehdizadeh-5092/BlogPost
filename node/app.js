@@ -27,8 +27,8 @@ app.get("/get_article", async (req, res) => {
     res.send(articles)
 })
 
-app.get("/get_user" , async (req, res) => {
-    useres = await User.find({role : "user"});
+app.get("/get_user", async (req, res) => {
+    useres = await User.find({ role: "user" });
     res.send(useres);
 })
 
@@ -151,8 +151,8 @@ app.post("/admin_login", async (req, res) => {
                 algorithm: "HS256",
             });
             let obj = {
-                token, 
-                check : "ok"
+                token,
+                check: "ok"
             }
             res.status(200).send(obj);
         }
@@ -181,11 +181,37 @@ app.post("/search", async (req, res) => {
     }
 })
 
-app.post("/del_user" , async (req, res) => {
+app.post("/del_user", async (req, res) => {
     username = req.body.username;
     await User.deleteOne({ username });
     res.send('کاربر با موفقیت حذف شد');
 })
+
+app.post("/add_user", async (req, res) => {
+    username = req.body.username;
+    password = req.body.password;
+    role = req.body.role;
+    if (username && password) {
+        findUser = await User.findOne({ username: username });
+        if (findUser) {
+            return res.send("چنین نام کاربری وجود دارد")
+        }
+        else {
+            let hash = bcrypt.hashSync(password, 8);
+            let NewUser = new User({
+                username,
+                password: hash,
+                role
+            })
+            NewUser.save().then(() => {
+                res.status(200).send("ثبت نام موفقیت آمیز بود")
+            })
+        }
+    }
+    else {
+        return res.send("fill")
+    }
+});
 
 app.listen(port, () => {
     console.log("listening on port", port);
