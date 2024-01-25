@@ -12,6 +12,29 @@
 
 
 
+## Ui framework
+
+vuetify
+
+bootstrap5
+
+## Library
+
+axios
+
+vue-router
+
+## Database
+
+mongodb
+
+## State Managment
+
+pinia
+
+## Authentication
+
+jwt
 
 ## Setup
 
